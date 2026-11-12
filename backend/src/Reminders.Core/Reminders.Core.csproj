@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Reminders.Core — модели, DbContext, репозитории, сервисы, интеграции.
+    Не зависит от ASP.NET целиком: Worker остаётся лёгким и запускается на runtime-образе без ASP.NET.
+  -->
+
+  <ItemGroup Label="Database">
+    <!-- EF Core + PostgreSQL; uint Version маппится на системный столбец xmin через IsRowVersion() -->
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <!-- snake_case имена таблиц/столбцов: users, team_members, channel_accounts, next_fire_at ... -->
+    <PackageReference Include="EFCore.NamingConventions" />
+  </ItemGroup>
+
+  <ItemGroup Label="Security">
+    <!-- SecretProtector (шифрование токенов ботов) + хранение ключей в таблице data_protection_keys -->
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" />
+    <!-- PasswordHasher<User>: PBKDF2, формат с версией, поддержка перехеширования -->
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" />
+  </ItemGroup>
+
+  <ItemGroup Label="Infrastructure">
+    <!-- IHttpClientFactory для Telegram (AddHttpClient в AddCore) -->
+    <PackageReference Include="Microsoft.Extensions.Http" />
+    <!-- Config/: services.AddOptions<T>().Bind(...).ValidateDataAnnotations().ValidateOnStart() -->
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" />
+  </ItemGroup>
+
+  <ItemGroup Label="Integrations">
+    <!-- Integrations/Telegram: sendMessage, getMe (проверка токена), getUpdates (коды привязки) -->
+    <PackageReference Include="Telegram.Bot" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Reminders.Core.Tests" />
+    <InternalsVisibleTo Include="Reminders.Api.Tests" />
+    <InternalsVisibleTo Include="Reminders.Worker.Tests" />
+  </ItemGroup>
+
+</Project>

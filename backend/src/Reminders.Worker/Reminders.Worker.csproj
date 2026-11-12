@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <!--
+    Reminders.Worker — SchedulerJob, DispatcherJob, TelegramReceiverJob (BackgroundService).
+    Всё остальное (EF Core, Telegram, DataProtection) приходит из Reminders.Core.
+  -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\Reminders.Core\Reminders.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Generic Host: DI, конфигурация, логирование, BackgroundService, корректная остановка по SIGTERM -->
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+  </ItemGroup>
+
+</Project>

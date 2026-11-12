@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!--
+    Reminders.Api — контроллеры. Аутентификация по cookie, rate limiting, CORS, ProblemDetails,
+    валидация DTO через DataAnnotations входят в ASP.NET Core и пакетов не требуют.
+  -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\Reminders.Core\Reminders.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Label="OpenAPI">
+    <!-- Генерация OpenAPI-документа (/openapi/v1.json) — из него фронтенд может генерировать TS-клиент -->
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <!-- Swagger UI поверх встроенного документа; подключать только в Development -->
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" />
+  </ItemGroup>
+
+  <ItemGroup Label="Migrations">
+    <!-- Нужен только для `dotnet ef` (Api — startup-проект); в сборку приложения не попадает -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

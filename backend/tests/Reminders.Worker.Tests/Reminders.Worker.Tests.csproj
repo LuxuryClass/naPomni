@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Тесты гарантированной доставки из документа «Решение» — на настоящем PostgreSQL:
+      • падение отправщика: запись в Sending, LockedUntil истёк → её берут снова;
+      • две копии Worker: два DispatcherJob параллельно, FOR UPDATE SKIP LOCKED → без двойной отправки;
+      • Telegram недоступен: IChannelSender бросает/таймаутит → паузы 1, 2, 4 … мин, не больше часа;
+      • бота удалили из чата → Failed + BrokenReason.
+  -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Reminders.Worker\Reminders.Worker.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
+    <!-- SKIP LOCKED и транзакции проверяются только на настоящем PostgreSQL -->
+    <PackageReference Include="Testcontainers.PostgreSql" />
+    <!-- Поддельный IChannelSender: «OK», таймаут, временная ошибка, «бот исключён из чата» -->
+    <PackageReference Include="NSubstitute" />
+    <!-- Перематываем время: срабатывание напоминания, истечение блокировки, паузы между попытками -->
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

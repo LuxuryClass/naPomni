@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Быстрые unit-тесты без БД и сети: ScheduleCalculator (каждые N дней/недель/месяцев/лет,
+    31-е число, переходы на летнее время), проверки прав в сервисах, правило «последний админ».
+  -->
+
+  <PropertyGroup>
+    <!-- xUnit v3: тестовый проект — исполняемый файл -->
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Reminders.Core\Reminders.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+    <!-- Покрытие кода: dotnet test с ключом coverage -->
+    <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
+    <!-- Подмена репозиториев и IChannelSender -->
+    <PackageReference Include="NSubstitute" />
+    <!-- FakeTimeProvider: управляем «сейчас» в расчёте следующего срабатывания и паузах повторов -->
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

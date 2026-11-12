@@ -1,0 +1,60 @@
+<Project>
+  <!-- Версии всех пакетов задаются только здесь, в .csproj без версий -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <!-- Вложенные зависимости тоже берут версии отсюда -->
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Версия .NET 10, обновлять раз в месяц -->
+    <DotNetPatch>10.0.15</DotNetPatch>
+  </PropertyGroup>
+
+  <!-- База данных -->
+  <ItemGroup Label="Database">
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+    <PackageVersion Include="EFCore.NamingConventions" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="$(DotNetPatch)" />
+
+    <!-- Вложенные пакеты, фиксируем ради обновлений -->
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="$(DotNetPatch)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="$(DotNetPatch)" />
+    <PackageVersion Include="Npgsql" Version="10.0.3" />
+  </ItemGroup>
+
+  <!-- Пароли и шифрование -->
+  <ItemGroup Label="Security">
+    <PackageVersion Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="$(DotNetPatch)" />
+    <PackageVersion Include="Microsoft.Extensions.Identity.Core" Version="$(DotNetPatch)" />
+  </ItemGroup>
+
+  <!-- HTTP, настройки, хост -->
+  <ItemGroup Label="Infrastructure">
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="$(DotNetPatch)" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="$(DotNetPatch)" />
+    <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="$(DotNetPatch)" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="$(DotNetPatch)" />
+  </ItemGroup>
+
+  <!-- Telegram -->
+  <ItemGroup Label="Integrations">
+    <PackageVersion Include="Telegram.Bot" Version="22.10.3.3" />
+  </ItemGroup>
+
+  <!-- Api -->
+  <ItemGroup Label="Api">
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="$(DotNetPatch)" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.3.1" />
+  </ItemGroup>
+
+  <!-- Тесты -->
+  <ItemGroup Label="Tests">
+    <PackageVersion Include="xunit.v3" Version="4.0.3" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.12.0" />
+    <PackageVersion Include="NSubstitute" Version="6.2.0" />
+    <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.11.0" />
+    <PackageVersion Include="Testcontainers.PostgreSql" Version="4.16.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(DotNetPatch)" />
+  </ItemGroup>
+</Project>

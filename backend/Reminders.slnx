@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="global.json" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path=".config/dotnet-tools.json" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Reminders.Core/Reminders.Core.csproj" />
+    <Project Path="src/Reminders.Api/Reminders.Api.csproj" />
+    <Project Path="src/Reminders.Worker/Reminders.Worker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Reminders.Core.Tests/Reminders.Core.Tests.csproj" />
+    <Project Path="tests/Reminders.Api.Tests/Reminders.Api.Tests.csproj" />
+    <Project Path="tests/Reminders.Worker.Tests/Reminders.Worker.Tests.csproj" />
+  </Folder>
+</Solution>
