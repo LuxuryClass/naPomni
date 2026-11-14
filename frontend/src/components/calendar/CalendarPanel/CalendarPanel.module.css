@@ -12,88 +12,41 @@
   padding: 16px;
 }
 
-.header {
+.konturWrap {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 }
 
-.header b {
-  font-size: 15px;
-}
-
-.weekdays {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  text-align: center;
-  font-size: 11px;
-  color: var(--muted);
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
-}
-
-.day {
+.dayContent {
   position: relative;
-  width: 100%;
-  height: 38px;
-  padding: 4px 0 0;
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  border: none;
-  background: transparent;
-  border-radius: 9px;
-  cursor: pointer;
-  font-size: 13px;
-  line-height: 18px;
-  color: var(--text);
+  justify-content: center;
+  width: 100%;
+  height: 100%;
 }
 
-.day:hover {
-  background: #F0F2F5;
-}
-
-.muted {
-  color: var(--past);
-}
-
-.today {
-  box-shadow: inset 0 0 0 1.5px var(--text);
-  font-weight: 700;
-}
-
-.selected,
-.selected:hover {
-  background: var(--text);
-  color: #fff;
-}
-
-.day:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-/* Точки жестко прибиты к низу ячейки, поэтому цифра сверху никогда не прыгает */
 .dots {
   position: absolute;
-  bottom: 5px;
+  bottom: 2px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 3px;
-  height: 5px;
+  gap: 2px;
 }
 
-.dots :global(.dot) {
+.dot {
+  display: inline-block;
   width: 5px;
   height: 5px;
   border-radius: 50%;
+  flex-shrink: 0;
 }
+
+.dot_urgent { background: var(--urgent, #e53935); }
+.dot_current { background: var(--accent, #1e88e5); }
+.dot_past { background: var(--past, #9e9e9e); }
 
 .legend {
   display: flex;
@@ -120,15 +73,8 @@
   margin-bottom: 8px;
 }
 
-.dayTitle b {
-  font-size: 13px;
-}
-
-.empty {
-  margin: 0;
-  font-size: 13px;
-  color: var(--muted);
-}
+.dayTitle b { font-size: 13px; }
+.empty { margin: 0; font-size: 13px; color: var(--muted); }
 
 .list {
   list-style: none;
@@ -141,18 +87,9 @@
   overflow-y: auto;
 }
 
-.list::-webkit-scrollbar {
-  width: 8px;
-}
-
-.list::-webkit-scrollbar-thumb {
-  background: #D3D7DD;
-  border-radius: 8px;
-}
-
-.list::-webkit-scrollbar-thumb:hover {
-  background: #B9BFC8;
-}
+.list::-webkit-scrollbar { width: 8px; }
+.list::-webkit-scrollbar-thumb { background: #d3d7dd; border-radius: 8px; }
+.list::-webkit-scrollbar-thumb:hover { background: #b9bfc8; }
 
 .list li {
   display: flex;
@@ -161,14 +98,17 @@
   font-size: 13px;
 }
 
-.listTime {
-  min-width: 40px;
-  color: var(--muted);
+.listTime { min-width: 40px; color: var(--muted); }
+.listTitle { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.customHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
-.listTitle {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.konturWrap :global([data-tid="MonthView__header"]) {
+  display: none;
 }
+

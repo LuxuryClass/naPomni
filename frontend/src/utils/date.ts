@@ -1,13 +1,12 @@
 import type { Reminder } from '../types';
 
-// Окно «горящего»: напоминание само поднимается наверх, если осталось ≤ 48 часов.
 export const URGENT_WINDOW_MS = 48 * 60 * 60 * 1000;
 
 export type ReminderGroup = 'urgent' | 'current' | 'past';
 
-export const MONTHS = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
 export const MONTHS_GEN = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
-export const WEEKDAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+
+const pad = (n: number) => String(n).padStart(2, '0');
 
 export function getGroup(r: Reminder, now: Date = new Date()): ReminderGroup {
   const t = new Date(r.date).getTime();
@@ -15,8 +14,6 @@ export function getGroup(r: Reminder, now: Date = new Date()): ReminderGroup {
   if (r.pinned || t - now.getTime() <= URGENT_WINDOW_MS) return 'urgent';
   return 'current';
 }
-
-const pad = (n: number) => String(n).padStart(2, '0');
 
 export function formatTime(iso: string): string {
   const d = new Date(iso);
@@ -46,9 +43,15 @@ export function formatDayTitle(d: Date): string {
   return `${d.getDate()} ${MONTHS_GEN[d.getMonth()]} ${d.getFullYear()}`;
 }
 
-export function toPickerValue(iso: string): string {
-  const d = new Date(iso);
+// Теперь принимает и строку ISO, и объект Date
+export function toPickerValue(input: string | Date): string {
+  const d = typeof input === 'string' ? new Date(input) : input;
   return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`;
+}
+
+export function parsePickerDate(value: string): Date {
+  const [day, month, year] = value.split('.').map(Number);
+  return new Date(year, month - 1, day);
 }
 
 export function fromPickerValue(value: string, hour = 10): string | null {
@@ -62,16 +65,4 @@ export function fromPickerValue(value: string, hour = 10): string | null {
 
 export function dayKey(d: Date): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
-
-export function buildCalendar(month: Date): Date[] {
-  const first = new Date(month.getFullYear(), month.getMonth(), 1);
-  const offset = (first.getDay() + 6) % 7;
-  const start = new Date(first);
-  start.setDate(first.getDate() - offset);
-  return Array.from({ length: 42 }, (_, i) => {
-    const d = new Date(start);
-    d.setDate(start.getDate() + i);
-    return d;
-  });
 }
