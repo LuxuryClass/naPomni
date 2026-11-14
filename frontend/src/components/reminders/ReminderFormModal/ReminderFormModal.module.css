@@ -1,0 +1,5 @@
+.form { display: flex; flex-direction: column; gap: 14px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.label { font-size: 13px; font-weight: 600; }
+.error { font-size: 12px; color: var(--urgent); }
+.hint { font-size: 12px; color: var(--muted); }

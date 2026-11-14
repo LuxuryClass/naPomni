@@ -1,0 +1,77 @@
+import type { Reminder } from '../types';
+
+// Окно «горящего»: напоминание само поднимается наверх, если осталось ≤ 48 часов.
+export const URGENT_WINDOW_MS = 48 * 60 * 60 * 1000;
+
+export type ReminderGroup = 'urgent' | 'current' | 'past';
+
+export const MONTHS = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+export const MONTHS_GEN = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+export const WEEKDAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+
+export function getGroup(r: Reminder, now: Date = new Date()): ReminderGroup {
+  const t = new Date(r.date).getTime();
+  if (t < now.getTime()) return 'past';
+  if (r.pinned || t - now.getTime() <= URGENT_WINDOW_MS) return 'urgent';
+  return 'current';
+}
+
+const pad = (n: number) => String(n).padStart(2, '0');
+
+export function formatTime(iso: string): string {
+  const d = new Date(iso);
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+export function isSameDay(a: Date, b: Date): boolean {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
+export function formatDayLabel(iso: string): string {
+  const d = new Date(iso);
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(now.getDate() + 1);
+  if (isSameDay(d, now)) return 'Сегодня';
+  if (isSameDay(d, tomorrow)) return 'Завтра';
+  return `${d.getDate()} ${MONTHS_GEN[d.getMonth()]}`;
+}
+
+export function formatFull(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getDate()} ${MONTHS_GEN[d.getMonth()]} ${d.getFullYear()}, ${formatTime(iso)}`;
+}
+
+export function formatDayTitle(d: Date): string {
+  return `${d.getDate()} ${MONTHS_GEN[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+export function toPickerValue(iso: string): string {
+  const d = new Date(iso);
+  return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`;
+}
+
+export function fromPickerValue(value: string, hour = 10): string | null {
+  const m = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(value.trim());
+  if (!m) return null;
+  const day = +m[1], month = +m[2], year = +m[3];
+  const d = new Date(year, month - 1, day, hour, 0, 0, 0);
+  if (d.getFullYear() !== year || d.getMonth() !== month - 1 || d.getDate() !== day) return null;
+  return d.toISOString();
+}
+
+export function dayKey(d: Date): string {
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+export function buildCalendar(month: Date): Date[] {
+  const first = new Date(month.getFullYear(), month.getMonth(), 1);
+  const offset = (first.getDay() + 6) % 7;
+  const start = new Date(first);
+  start.setDate(first.getDate() - offset);
+  return Array.from({ length: 42 }, (_, i) => {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    return d;
+  });
+}

@@ -1,0 +1,31 @@
+:root {
+  --bg: #F6F7F9;
+  --surface: #FFFFFF;
+  --border: #E3E6EA;
+  --text: #1A1C1F;
+  --muted: #7A8089;
+  --accent: #2F6FED;
+  --urgent: #E5484D;
+  --past: #C3C8CF;
+  --rail: #F1F2F5;
+}
+
+* { 
+  box-sizing: border-box; 
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+button { font: inherit; }
+#root { height: 100vh; }
+
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.dot--urgent { background: var(--urgent); }
+.dot--current { background: var(--accent); }
+.dot--past { background: var(--past); }
