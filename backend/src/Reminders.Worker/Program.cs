@@ -1,0 +1,8 @@
+using Reminders.Core;
+
+var builder = Host.CreateApplicationBuilder(args);
+
+builder.Services.AddCore(builder.Configuration);
+
+var host = builder.Build();
+host.Run();
