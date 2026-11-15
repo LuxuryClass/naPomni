@@ -1,0 +1,26 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+COPY backend/.config/ .config/
+COPY backend/global.json backend/Directory.Build.props backend/Directory.Packages.props ./
+COPY backend/src/Reminders.Core/Reminders.Core.csproj src/Reminders.Core/
+COPY backend/src/Reminders.Api/Reminders.Api.csproj src/Reminders.Api/
+RUN dotnet tool restore && dotnet restore src/Reminders.Api/Reminders.Api.csproj
+
+COPY backend/src/ src/
+RUN dotnet publish src/Reminders.Api/Reminders.Api.csproj -c Release -o /app --no-restore
+
+# Для создания bundle подключение к базе не требуется.
+RUN databaseUrl='Host=localhost;Database=design_time;Username=design_time' dotnet ef migrations bundle \
+      --project src/Reminders.Core \
+      --startup-project src/Reminders.Api \
+      --self-contained -r linux-x64 \
+      -o /app/efbundle
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
+WORKDIR /app
+COPY --from=build /app .
+ENV ASPNETCORE_HTTP_PORTS=8080
+EXPOSE 8080
+USER $APP_UID
+ENTRYPOINT ["dotnet", "Reminders.Api.dll"]

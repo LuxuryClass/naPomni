@@ -1,0 +1,22 @@
+.vs
+.claude
+AGENTS.md
+
+# ===== Секреты и локальные настройки =====
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+appsettings.*.local.json
+secrets.json
+
+# ===== Frontend (Node, Vite) =====
+node_modules/
+dist/
+dist-ssr/
+.vite/
+coverage/
+*.tsbuildinfo
+.eslintcache
+.npm/

@@ -1,0 +1,11 @@
+.git
+.vs
+.claude
+**/bin/
+**/obj/
+**/*.user
+**/.env
+frontend/
+docs/
+backend/docs/
+backend/tests/
