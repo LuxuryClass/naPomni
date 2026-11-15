@@ -48,7 +48,7 @@
 }
 
 .appBtn:hover {
-  background: #E7E9EE;
+  background: var(--hover);
 }
 
 .logo {
@@ -114,18 +114,18 @@
 }
 
 .teamBtn:hover {
-  background: #E7E9EE;
+  background: var(--hover);
 }
 
 .teamBtn.active {
-  background: #E2E5EB;
+  background: var(--active);
   font-weight: 600;
 }
 
 .badge {
   display: grid;
   place-items: center;
-  color: #fff;
+  color: var(--on-color);
   font-weight: 700;
   border-radius: 50%;
   flex-shrink: 0;
@@ -169,7 +169,7 @@
 }
 
 .row:hover {
-  background: #E7E9EE;
+  background: var(--hover);
 }
 
 .iconSlot {
@@ -197,7 +197,7 @@
 }
 
 .userBtn:hover {
-  background: #E7E9EE;
+  background: var(--hover);
 }
 
 .avatar {
@@ -206,8 +206,8 @@
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, #2F6FED, #8B5CF6);
-  color: #fff;
+  background: linear-gradient(135deg, var(--avatar-from), var(--avatar-to));
+  color: var(--on-color);
   border-radius: 50%;
   font-weight: 700;
   font-size: 13px;

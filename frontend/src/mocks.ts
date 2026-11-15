@@ -2,12 +2,12 @@
 import type { Reminder, Team, UserProfile } from './types';
 
 export const TEAMS: Team[] = [
-  { id: 'platform',   name: 'Платформа',   short: 'П', color: '#2F6FED' },
-  { id: 'accounting', name: 'Бухгалтерия', short: 'Б', color: '#8B5CF6' },
-  { id: 'it',         name: 'ИТ',          short: 'И', color: '#2FA84F' },
-  { id: 'marketing',  name: 'Маркетинг',   short: 'М', color: '#F59E0B' },
-  { id: 'sales',      name: 'Продажи',     short: 'П', color: '#14B8A6' },
-  { id: 'hr',         name: 'HR',          short: 'HR', color: '#EC4899' },
+  { id: 'platform',   name: 'Платформа',   short: 'П',  color: 'var(--team-blue)' },
+  { id: 'accounting', name: 'Бухгалтерия', short: 'Б',  color: 'var(--team-purple)' },
+  { id: 'it',         name: 'ИТ',          short: 'И',  color: 'var(--team-green)' },
+  { id: 'marketing',  name: 'Маркетинг',   short: 'М',  color: 'var(--team-orange)' },
+  { id: 'sales',      name: 'Продажи',     short: 'П',  color: 'var(--team-teal)' },
+  { id: 'hr',         name: 'HR',          short: 'HR', color: 'var(--team-pink)' },
 ];
 
 export const CURRENT_USER: UserProfile = {

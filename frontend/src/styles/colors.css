@@ -1,0 +1,41 @@
+:root {
+  /* Поверхности и текст */
+  --bg: #FFFFFFF5;
+  --surface: #FFFFFF;
+  --rail: #F1F2F5;
+  --border: #E3E6EA;
+  --text: #000000E0;
+  --text-secondary: #696969;
+  --muted: #A4A4A4;
+  --on-color: #FFFFFF;
+
+  /* Интерактив */
+  --accent: #2291FF;
+  --hover: #E7E9EE;
+  --active: #E2E5EB;
+  --scrollbar: #D3D7DD;
+  --scrollbar-hover: #B9BFC8;
+
+  /* Статусы */
+  --urgent: #C50220;
+  --urgent-bg: #FFFBFB;
+  --urgent-badge: #FDE3E3;
+  --past: #C3C8CF;
+  --past-bg: #FAFBFC;
+  --badge-bg: #EEF0F3;
+
+  /* Аватар пользователя */
+  --avatar-from: #2291FF;
+  --avatar-to: #CF60EC;
+
+  /* Тени */
+  --shadow-card: 0 2px 10px rgba(20, 24, 32, 0.07);
+
+  /* Палитра команд */
+  --team-blue: #2291FF;
+  --team-purple: #CF60EC;
+  --team-green: #00B74E;  
+  --team-orange: #D26E00;
+  --team-teal: #00BEA2;
+  --team-pink: #C50220;
+}
