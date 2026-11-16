@@ -1,0 +1,236 @@
+АРХИТЕКТУРА БЭКЕНДА — СЕРВИС УПРАВЛЕНИЯ НАПОМИНАНИЯМИ
+
+
+==============================================================================
+1 АРХИТЕКТУРА
+==============================================================================
+
+Слоистая архитектура: Controllers -> Services -> Repositories -> Models
+  Controllers   принимают запрос (DTO), берут id пользователя, вызывают сервис
+  Services      вся логика и проверки прав; сохраняют изменения
+  Repositories  только запросы к БД
+  Models        таблицы БД
+  Dtos          вход выход
+
+Проекты: Api и Worker ссылаются на Core
+
+В MVP все команды используют одного общего Telegram-бота. Его токен задаётся
+в конфигурации сервиса и не хранится отдельно для каждой команды.
+Telegram-чаты привязываются непосредственно к командам. Для привязки
+администратор получает одноразовый код с ограниченным сроком действия.
+
+Worker обрабатывает обновления общего бота и связывает чат с командой.
+Позиция чтения обновлений общая для бота и сохраняется в базе данных.
+Отправка во все чаты команды выполняется через общий интерфейс канала.
+
+reminders/
+├── backend/
+│   ├── Reminders.slnx
+│   ├── src/
+│   │   ├── Reminders.Core/
+│   │   │   ├── Config/
+│   │   │   ├── Database/
+│   │   │   ├── Security/
+│   │   │   │   └── PasswordHasher.cs
+│   │   │   ├── Exceptions/
+│   │   │   ├── Models/
+│   │   │   │   ├── User.cs
+│   │   │   │   ├── Team.cs
+│   │   │   │   ├── TeamMember.cs
+│   │   │   │   ├── Reminder.cs
+│   │   │   │   ├── ChannelTarget.cs
+│   │   │   │   ├── ChannelBinding.cs
+│   │   │   │   ├── TelegramBotState.cs
+│   │   │   │   └── Delivery.cs
+│   │   │   ├── Dtos/
+│   │   │   │   ├── AuthDtos.cs
+│   │   │   │   ├── TeamDtos.cs
+│   │   │   │   ├── ReminderDtos.cs
+│   │   │   │   └── ChannelDtos.cs
+│   │   │   ├── Repositories/                       запросы к БД
+│   │   │   │   ├── IUserRepository.cs
+│   │   │   │   ├── UserRepository.cs
+│   │   │   │   └── ...
+│   │   │   ├── Services/                           бизнес-логика, проверки прав, сохранение
+│   │   │   ├── Integrations/
+│   │   │   │   ├── IChannelSender.cs               отправка в канал
+│   │   │   │   ├── IChannelConnector.cs
+│   │   │   │   └── Telegram/
+│   │   │   ├── Utils/
+│   │   │   │   ├── Enums.cs                        RepeatUnit, DeliveryStatus, ChannelType, MemberRole
+│   │   │   │   ├── ScheduleCalculator.cs           расчёт следующего срабатывания
+│   │   │   │   └── SecretTokens.cs                 случайные токены и их хеши
+│   │   │   └── DependencyInjection.cs              AddCore(): регистрирует всё выше
+│   │   ├── Reminders.Api/
+│   │   │   ├── Program.cs
+│   │   │   └── Controllers/
+│   │   │       ├── AuthController.cs
+│   │   │       ├── UsersController.cs
+│   │   │       ├── TeamsController.cs
+│   │   │       ├── RemindersController.cs
+│   │   │       └── ChannelsController.cs
+│   │   └── Reminders.Worker/
+│   │       ├── Program.cs
+│   │       └── Jobs/
+│   │           ├── SchedulerJob.cs                 наступившие напоминания => записи об отправке
+│   │           ├── DispatcherJob.cs                отправка и повторы
+│   │           └── TelegramReceiverJob.cs
+│   └── tests/
+├── frontend/
+├── deploy/
+└── docs/
+
+
+==============================================================================
+2 МОДЕЛИ ДАННЫХ (Reminders.Core/Models)
+==============================================================================
+
+------------------------------------------------------------------------------
+User
+------------------------------------------------------------------------------
+  Guid        Id
+  string      Email
+  string      PasswordHash
+  DateTime    CreatedAt
+  DateTime?   DeactivatedAt
+
+  List<TeamMember>  Memberships    навигация
+
+
+------------------------------------------------------------------------------
+Team
+------------------------------------------------------------------------------
+  Guid        Id
+  string      Name
+  string?     InviteTokenHash      хеш действующей ссылки-приглашения
+  DateTime?   InviteExpiresAt      +7 дней от создания ссылки
+  DateTime    CreatedAt
+
+  List<TeamMember>  Members        навигация
+
+
+------------------------------------------------------------------------------
+TeamMember
+------------------------------------------------------------------------------
+  Guid        TeamId
+  Guid        UserId
+  MemberRole  Role		   обычный участник или админ
+  DateTime    JoinedAt
+
+  Team        Team                 навигация
+  User        User                 навигация
+
+
+------------------------------------------------------------------------------
+Reminder
+------------------------------------------------------------------------------
+  Guid          Id
+  Guid          TeamId
+  Guid          AuthorId
+  string        Title              	до 200 символов
+  string?       Description        	до 2000 символов
+  DateTime      StartLocal
+  string        TimeZoneId
+  RepeatUnit?   RepeatUnit         	null — разовое
+  int?          RepeatEvery        	N в «каждые N дней / недель / месяцев / лет»
+  int           NextOccurrenceNumber    номер следующего срабатывания
+  DateTime?     NextFireAt         	null — больше не сработает
+  DateTime      CreatedAt
+  uint          Version            	xmin защита от одновременной правки
+
+
+------------------------------------------------------------------------------
+ChannelBinding (Одноразовый код привязки нового чата к команде)
+------------------------------------------------------------------------------
+
+  Guid        Id
+  Guid        TeamId
+  ChannelType Type                   Telegram
+  string      CodeHash               хеш одноразового кода
+  DateTime    ExpiresAt              срок действия кода: 1 час
+  DateTime?   UsedAt                 время использования; null — не использован
+  DateTime    CreatedAt
+
+
+------------------------------------------------------------------------------
+ChannelTarget
+------------------------------------------------------------------------------
+  Guid        Id
+  Guid        TeamId
+  ChannelType Type                 Telegram
+  string      Address              chat_id
+  string      Title
+  string?     BrokenReason
+  DateTime    CreatedAt
+
+  Team        Team                 навигация
+
+
+------------------------------------------------------------------------------
+TelegramBotState (Общее состояние приема обновлений единственного Telegram-бота)
+------------------------------------------------------------------------------
+
+  int         Id                   идентификатор единственной записи
+  long?       UpdatesOffset        следующее обновление для чтения
+
+
+------------------------------------------------------------------------------
+Delivery
+------------------------------------------------------------------------------
+Отправка одного срабатывания в один чат
+
+  Guid             Id
+  Guid             TeamId
+  Guid             TargetId
+  Guid?            ReminderId      null если напоминание удалили
+  string           Title
+  DateTime         ScheduledAt
+  DeliveryStatus   Status
+  int              Attempts
+  DateTime         NextAttemptAt   индекс для очереди
+  DateTime?        LockedUntil     захват отправщиком
+  Guid?            LeaseToken
+  string?          LastError
+  DateTime?        DeliveredAt
+  DateTime         CreatedAt
+
+
+------------------------------------------------------------------------------
+Перечисления (Utils/Enums.cs)
+------------------------------------------------------------------------------
+  RepeatUnit       Day, Week, Month, Year
+  DeliveryStatus   Pending, Sending, Delivered, Failed
+  ChannelType      Telegram
+  MemberRole	   Member, Admin
+
+
+==============================================================================
+3 ТАБЛИЦЫ БД
+==============================================================================
+  users                  User
+  teams                  Team
+  team_members           TeamMember
+  reminders              Reminder
+  channel_targets        ChannelTarget
+  channel_bindings       ChannelBinding
+  telegram_bot_state     TelegramBotState
+  deliveries             Delivery
+
+
+==============================================================================
+4 ПОДКЛЮЧЕНИЕ И ДОСТАВКА В TELEGRAM
+==============================================================================
+
+  1. Администратор команды создаёт одноразовый код привязки. В базе хранится
+     только его хеш и срок действия; ссылка содержит исходный код.
+  2. Администратор добавляет общего бота в чат и передаёт ему код привязки.
+  3. Worker получает обновление, проверяет код и его срок действия, привязывает
+     чат к команде и помечает код использованным. Эти изменения и позиция
+     чтения обновлений сохраняются согласованно, чтобы после сбоя обновление
+     можно было обработать повторно без повторной привязки.
+  4. Планировщик создаёт запись Delivery для каждого чата команды. Отправщик
+     использует общий токен бота и адрес чата для доставки сообщения.
+
+  Токен бота хранится в конфигурации сервиса, не передаётся пользователям и
+  не сохраняется в записях команд или чатов. При запуске нескольких экземпляров
+  Worker приём обновлений общего бота должен выполняться согласованно.
