@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices.Marshalling;
 using Microsoft.EntityFrameworkCore;
 using Reminders.Core.Models;
 
@@ -18,5 +19,11 @@ public class RemindersDbContext : DbContext
     public DbSet<ChannelTarget> ChannelTargets => Set<ChannelTarget>();
     public DbSet<TelegramBotState> TelegramBotStates => Set<TelegramBotState>();
     public DbSet<Delivery> Deliveries => Set<Delivery>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(RemindersDbContext).Assembly);
+    }
 }
 
