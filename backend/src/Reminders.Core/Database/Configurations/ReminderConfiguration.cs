@@ -8,20 +8,13 @@ public class ReminderConfiguration : IEntityTypeConfiguration<Reminder>
 {
     public void Configure(EntityTypeBuilder<Reminder> builder)
     {
-        builder.ToTable("remiders", table =>
+        builder.ToTable("reminders", table =>
             table.HasCheckConstraint(
                 "ck_reminders_repeat_settings",
                 """
-                (
-                    repeat_unit IS NULL 
-                    AND repeat_every IS NULL
-                )
+                (repeat_unit IS NULL AND repeat_every IS NULL)
                 OR
-                (
-                    repeat_unit IS NOT NULL 
-                    AND repeat_every IS NOT NULL 
-                    AND repeat_every > 0
-                )
+                (repeat_unit IS NOT NULL AND repeat_every IS NOT NULL AND repeat_every > 0)
                 """));
 
         builder.HasOne<Team>()
