@@ -26,4 +26,3 @@ public class RemindersDbContext : DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(RemindersDbContext).Assembly);
     }
 }
-

@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Reminders.Core.Utils;
+using Reminders.Core.Validation;
 
 namespace Reminders.Core.Models
 {
@@ -11,10 +12,10 @@ namespace Reminders.Core.Models
         public Guid TeamId { get; set; }
         public Guid AuthorId { get; set; }
 
-        [MaxLength(200)]
+        [MaxLength(ValidationLimits.ReminderTitleMaxLength)]
         public string Title { get; set; } = null!;
 
-        [MaxLength(2000)]
+        [MaxLength(ValidationLimits.ReminderDescriptionMaxLength)]
         public string? Description { get; set; }
 
         [Column(TypeName = "timestamp without time zone")]

@@ -1,15 +1,16 @@
 using System.ComponentModel.DataAnnotations;
 using Reminders.Core.Utils;
+using Reminders.Core.Validation;
 
 namespace Reminders.Core.Dtos;
 
 public class ReminderCreateRequest
 {
     [Required]
-    [MaxLength(200)]
+    [MaxLength(ValidationLimits.ReminderTitleMaxLength)]
     public string Title { get; set; } = null!;
 
-    [MaxLength(2000)]
+    [MaxLength(ValidationLimits.ReminderDescriptionMaxLength)]
     public string? Description { get; set; }
 
     [Required]
@@ -28,10 +29,10 @@ public class ReminderCreateRequest
 public class ReminderUpdateRequest
 {
     [Required]
-    [MaxLength(200)]
+    [MaxLength(ValidationLimits.ReminderTitleMaxLength)]
     public string Title { get; set; } = null!;
 
-    [MaxLength(2000)]
+    [MaxLength(ValidationLimits.ReminderDescriptionMaxLength)]
     public string? Description { get; set; }
 
     [Required]

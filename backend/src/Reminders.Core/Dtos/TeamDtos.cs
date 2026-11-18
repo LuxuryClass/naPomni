@@ -1,12 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using Reminders.Core.Utils;
+using Reminders.Core.Validation;
 
 namespace Reminders.Core.Dtos;
 
 public class TeamCreateRequest
 {
     [Required]
-    [MaxLength(100)]        
+    [MaxLength(ValidationLimits.TeamNameMaxLength)]        
     public string Name { get; set; } = null!;
 }
 
@@ -23,4 +24,3 @@ public class TeamMemberResponse
     public string Email { get; set; } = null!;
     public MemberRole Role { get; set; }
 }
-

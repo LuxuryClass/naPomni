@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Reminders.Core.Models;
+using Reminders.Core.Validation;
 
 namespace Reminders.Core.Database.Configurations;
 
@@ -14,7 +15,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasKey(user => user.Id);
 
         builder.Property(user => user.Email)
-            .HasMaxLength(254);
+            .HasMaxLength(ValidationLimits.EmailMaxLength);
 
         builder.HasIndex(user => user.Email)
             .IsUnique();
