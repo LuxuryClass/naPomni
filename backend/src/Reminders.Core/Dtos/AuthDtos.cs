@@ -9,6 +9,7 @@ public class RegisterRequest
     [EmailAddress]
     [MaxLength(254)]
     public string Email { get; set; } = null!;
+
     [Required]
     [MinLength(8)]
     [MaxLength(100)]
@@ -21,6 +22,7 @@ public class LoginRequest
     [EmailAddress]
     [MaxLength(254)]
     public string Email { get; set; } = null!;
+
     [Required]
     [MaxLength(100)]
     public string Password { get; set; } = null!;

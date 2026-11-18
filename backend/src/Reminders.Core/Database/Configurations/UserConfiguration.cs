@@ -14,13 +14,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasKey(user => user.Id);
 
         builder.Property(user => user.Email)
-            .HasMaxLength(254)
-            .IsRequired();
+            .HasMaxLength(254);
 
-        builder.HasIndex(user => user.Email).IsUnique();
-
-        builder.Property(user => user.PasswordHash).IsRequired();
-        builder.Property(user => user.CreatedAt).IsRequired();
-        builder.Property(user => user.DeactivatedAt).IsRequired(false);
+        builder.HasIndex(user => user.Email)
+            .IsUnique();
     }
 }

@@ -12,6 +12,7 @@ namespace Reminders.Core.Models
         public Guid TeamId { get; set; }
         public Guid TargetId { get; set; }
         public Guid? ReminderId { get; set; }
+
         [DeleteBehavior(DeleteBehavior.SetNull)]
         public Reminder? Reminder { get; set; }
         public string Title { get; set; } = null!;

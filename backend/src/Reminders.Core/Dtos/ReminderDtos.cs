@@ -8,14 +8,19 @@ public class ReminderCreateRequest
     [Required]
     [MaxLength(200)]
     public string Title { get; set; } = null!;
+
     [MaxLength(2000)]
     public string? Description { get; set; }
+
     [Required]
     public DateTime? StartLocal { get; set; }
+
     [Required]
     public string TimeZoneId { get; set; } = null!;
+
     [EnumDataType(typeof(RepeatUnit))]
     public RepeatUnit? RepeatUnit { get; set; }
+
     [Range(1, int.MaxValue)]
     public int? RepeatEvery { get; set; }
 }
@@ -25,16 +30,22 @@ public class ReminderUpdateRequest
     [Required]
     [MaxLength(200)]
     public string Title { get; set; } = null!;
+
     [MaxLength(2000)]
     public string? Description { get; set; }
+
     [Required]
     public DateTime? StartLocal { get; set; }
+
     [Required]
     public string TimeZoneId { get; set; } = null!;
+
     [EnumDataType(typeof(RepeatUnit))]
     public RepeatUnit? RepeatUnit { get; set; }
+
     [Range(1, int.MaxValue)]
     public int? RepeatEvery { get; set; }
+
     [Required]
     public uint? Version { get; set; }
 }
