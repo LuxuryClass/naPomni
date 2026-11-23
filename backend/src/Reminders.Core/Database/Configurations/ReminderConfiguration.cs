@@ -17,6 +17,9 @@ public class ReminderConfiguration : IEntityTypeConfiguration<Reminder>
                 (repeat_unit IS NOT NULL AND repeat_every IS NOT NULL AND repeat_every > 0)
                 """));
 
+        builder.HasIndex(reminder => reminder.NextFireAt)
+            .HasFilter("next_fire_at IS NOT NULL");
+
         builder.HasOne<Team>()
             .WithMany()
             .HasForeignKey(reminder => reminder.TeamId)
