@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Clock, Delete, Edit, Pin } from '@skbkontur/react-icons';
 import { Button, Gapped, Tooltip } from '@skbkontur/react-ui';
 import type { Reminder, Team } from '../../../types';
-import { formatDayLabel, formatFull, formatTime, getGroup } from '../../../utils/date';
+import { formatDayLabel, formatFull, formatTime } from '../../../utils/date';
 import s from './ReminderCard.module.css';
 
 interface Props {
@@ -15,16 +15,11 @@ interface Props {
   onDelete: (id: string) => void;
 }
 
-const GROUP_LABEL = { urgent: 'Горящее', current: 'Актуальное', past: 'Прошедшее' } as const;
-
 export function ReminderCard({ reminder, team, index, onTogglePin, onEdit, onDelete }: Props) {
   const [open, setOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const group = getGroup(reminder);
-  const groupClass = group === 'urgent' ? s.urgent : group === 'past' ? s.past : '';
-
   return (
-    <article className={`${s.card} ${groupClass}`} style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}>
+    <article className={s.card} style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}>
       <div className={s.main}>
         <div className={s.date}>
           <b>{formatDayLabel(reminder.date)}</b>
@@ -33,27 +28,24 @@ export function ReminderCard({ reminder, team, index, onTogglePin, onEdit, onDel
 
         <div className={s.body}>
           <div className={s.title}>
-            {reminder.pinned && group !== 'past' && <Pin size={14} color="#E5484D" />}
+            {reminder.pinned && <Pin size={14} color="#E5484D" />}
             <span>{reminder.title}</span>
           </div>
           <div className={s.meta}>
             {team && (
               <span className={s.teamChip}><i style={{ background: team.color }} />{team.name}</span>
             )}
-            <span className={s.groupLabel}>{GROUP_LABEL[group]}</span>
           </div>
         </div>
 
         <div className={s.actions}>
-          {group !== 'past' && (
-            <Tooltip pos="top" render={() => (reminder.pinned ? 'Открепить' : 'Закрепить в «Горящих»')}>
-              <Button
-                size="small"
-                icon={<Pin size={14} color={reminder.pinned ? '#E5484D' : undefined} />}
-                onClick={() => onTogglePin(reminder.id)}
-              />
-            </Tooltip>
-          )}
+          <Tooltip pos="top" render={() => (reminder.pinned ? 'Открепить' : 'Закрепить')}>
+            <Button
+              size="small"
+              icon={<Pin size={14} color={reminder.pinned ? '#E5484D' : undefined} />}
+              onClick={() => onTogglePin(reminder.id)}
+            />
+          </Tooltip>
           <Button size="small" onClick={() => setOpen(v => !v)}>
             {open ? 'Свернуть' : 'Подробнее'}
           </Button>

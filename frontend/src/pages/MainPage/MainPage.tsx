@@ -9,15 +9,14 @@ import { ReminderFormModal } from '../../components/reminders/ReminderFormModal/
 import { useReminders } from '../../hooks/useReminders';
 import { CURRENT_USER, TEAMS } from '../../mocks';
 import type { Reminder, ReminderDraft } from '../../types';
-import type { ReminderGroup } from '../../utils/date';
 import { getGroup } from '../../utils/date';
 import s from './MainPage.module.css';
 
-const GROUPS: { key: ReminderGroup; title: string }[] = [
-  { key: 'urgent', title: 'Горящие' },
-  { key: 'current', title: 'Актуальные' },
-  { key: 'past', title: 'Прошедшие' },
-];
+const GROUPS = [
+  { key: 'today', title: 'Сегодня' },
+  { key: 'week', title: 'Эта неделя' },
+  { key: 'later', title: 'Далее' },
+] as const;
 
 interface ToastState {
   id: number;
@@ -32,6 +31,14 @@ export function MainPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Reminder | null>(null);
   const [toast, setToast] = useState<ToastState | null>(null);
+  const [today, setToday] = useState(() => new Date());
+
+  useEffect(() => {
+    const now = new Date();
+    const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    const timer = setTimeout(() => setToday(new Date()), Math.max(0, tomorrow.getTime() - now.getTime()));
+    return () => clearTimeout(timer);
+  }, [today]);
 
   // Наш заменитель Toast.push: показываем и сами прячем через 4 секунды
   const show = (text: string) => setToast({ id: Date.now(), text });
@@ -53,13 +60,15 @@ export function MainPage() {
   }, [items, activeTeamId, query]);
 
   const grouped = useMemo(() => {
-    const g: Record<ReminderGroup, Reminder[]> = { urgent: [], current: [], past: [] };
-    for (const r of visible) g[getGroup(r)].push(r);
-    g.urgent.sort((a, b) => a.date.localeCompare(b.date));
-    g.current.sort((a, b) => a.date.localeCompare(b.date));
-    g.past.sort((a, b) => b.date.localeCompare(a.date));
-    return g;
-  }, [visible]);
+    const groups: Record<(typeof GROUPS)[number]['key'], Reminder[]> = { today: [], week: [], later: [] };
+    const sorted = [...visible].sort((a, b) => Date.parse(a.date) - Date.parse(b.date));
+    for (const reminder of sorted) {
+      const group = getGroup(reminder, today);
+      if (group !== 'archive') groups[group].push(reminder);
+    }
+    return groups;
+  }, [visible, today]);
+  const activeReminders = useMemo(() => GROUPS.flatMap(({ key }) => grouped[key]), [grouped]);
 
   const openCreate = () => { setEditing(null); setFormOpen(true); };
   const openEdit = (r: Reminder) => { setEditing(r); setFormOpen(true); };
@@ -95,6 +104,19 @@ export function MainPage() {
       show('Не удалось изменить закрепление');
     }
   };
+
+  const renderCards = (reminders: Reminder[]) =>
+    reminders.map((reminder, index) => (
+      <ReminderCard
+        key={reminder.id}
+        reminder={reminder}
+        team={TEAMS.find(team => team.id === reminder.teamId)}
+        index={index}
+        onTogglePin={handleTogglePin}
+        onEdit={openEdit}
+        onDelete={handleDelete}
+      />
+    ));
 
   return (
     <div className={s.app}>
@@ -153,30 +175,23 @@ export function MainPage() {
               ) : (
                 GROUPS.map(({ key, title }) =>
                   grouped[key].length > 0 && (
-                    <section className={s.group} key={key}>
-                      <h2 className={`${s.groupTitle}${key === 'urgent' ? ` ${s.groupTitleUrgent}` : ''}`}>
+                    <section className={key === 'today' ? s.todayGroup : undefined} key={key}>
+                      <h2 className={s.groupTitle}>
                         {title} <span>{grouped[key].length}</span>
                       </h2>
                       <div className={s.groupItems}>
-                        {grouped[key].map((r, i) => (
-                          <ReminderCard
-                            key={r.id}
-                            reminder={r}
-                            team={TEAMS.find(t => t.id === r.teamId)}
-                            index={i}
-                            onTogglePin={handleTogglePin}
-                            onEdit={openEdit}
-                            onDelete={handleDelete}
-                          />
-                        ))}
+                        {renderCards(grouped[key])}
                       </div>
                     </section>
                   ),
                 )
               )}
+              <div>
+                <Button disabled>Архив задач</Button>
+              </div>
             </section>
 
-            <CalendarPanel reminders={visible} teams={TEAMS} />
+            <CalendarPanel reminders={activeReminders} teams={TEAMS} />
           </div>
         )}
       </main>

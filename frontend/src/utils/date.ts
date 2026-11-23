@@ -1,8 +1,6 @@
 import type { Reminder } from '../types';
 
-export const URGENT_WINDOW_MS = 48 * 60 * 60 * 1000;
-
-export type ReminderGroup = 'urgent' | 'current' | 'past';
+export type ReminderGroup = 'today' | 'week' | 'later' | 'archive';
 
 export const MONTHS_GEN = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
 
@@ -10,9 +8,18 @@ const pad = (n: number) => String(n).padStart(2, '0');
 
 export function getGroup(r: Reminder, now: Date = new Date()): ReminderGroup {
   const t = new Date(r.date).getTime();
-  if (t < now.getTime()) return 'past';
-  if (r.pinned || t - now.getTime() <= URGENT_WINDOW_MS) return 'urgent';
-  return 'current';
+  const startOfToday = new Date(now);
+  startOfToday.setHours(0, 0, 0, 0);
+  if (t < startOfToday.getTime()) return 'archive';
+
+  const startOfTomorrow = new Date(startOfToday);
+  startOfTomorrow.setDate(startOfToday.getDate() + 1);
+  if (t < startOfTomorrow.getTime()) return 'today';
+
+  const startOfNextWeek = new Date(startOfToday);
+  const daysUntilMonday = 7 - (startOfToday.getDay() + 6) % 7;
+  startOfNextWeek.setDate(startOfToday.getDate() + daysUntilMonday);
+  return t < startOfNextWeek.getTime() ? 'week' : 'later';
 }
 
 export function formatTime(iso: string): string {

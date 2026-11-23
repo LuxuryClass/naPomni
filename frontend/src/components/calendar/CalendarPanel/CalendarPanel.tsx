@@ -1,7 +1,7 @@
 import { type ComponentProps, useMemo, useRef, useState } from 'react';
 import { Button, Calendar, Select, Tooltip } from '@skbkontur/react-ui';
 import type { Reminder, Team } from '../../../types';
-import { formatDayTitle, formatTime, getGroup, parsePickerDate, toPickerValue } from '../../../utils/date';
+import { formatDayTitle, formatTime, parsePickerDate, toPickerValue } from '../../../utils/date';
 import s from './CalendarPanel.module.css';
 
 interface Props {
@@ -10,12 +10,6 @@ interface Props {
 }
 
 type DayProps = Parameters<NonNullable<ComponentProps<typeof Calendar>['renderDay']>>[0];
-
-const LEGEND = [
-  ['urgent', 'Горящие'],
-  ['current', 'Актуальные'],
-  ['past', 'Прошедшие'],
-] as const;
 
 const MONTHS = [
   [1, 'Январь'], [2, 'Февраль'], [3, 'Март'], [4, 'Апрель'],
@@ -78,7 +72,7 @@ export function CalendarPanel({ reminders, teams }: Props) {
           <span>{+props.date.slice(0, 2)}</span>
           {items.length > 0 && (
             <span className={s.dots}>
-              {items.slice(0, 3).map(r => <i key={r.id} className={`${s.dot} ${s[`dot_${getGroup(r)}`]}`} />)}
+              {items.slice(0, 3).map(r => <i key={r.id} className={s.dot} />)}
             </span>
           )}
         </span>
@@ -138,12 +132,6 @@ export function CalendarPanel({ reminders, teams }: Props) {
           maxDate={`31.12.${currentYear + 5}`}
           renderDay={renderDay}
         />
-      </div>
-
-      <div className={s.legend}>
-        {LEGEND.map(([key, label]) => (
-          <span key={key}><i className={`${s.dot} ${s[`dot_${key}`]}`} /> {label}</span>
-        ))}
       </div>
 
       <div className={s.dayPanel}>
