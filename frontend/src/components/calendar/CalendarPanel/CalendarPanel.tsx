@@ -7,6 +7,7 @@ import s from './CalendarPanel.module.css';
 interface Props {
   reminders: Reminder[];
   teams: Team[];
+  onOpenReminder: (reminder: Reminder) => void;
 }
 
 type DayProps = Parameters<NonNullable<ComponentProps<typeof Calendar>['renderDay']>>[0];
@@ -17,7 +18,7 @@ const MONTHS = [
   [9, 'Сентябрь'], [10, 'Октябрь'], [11, 'Ноябрь'], [12, 'Декабрь'],
 ] as const;
 
-export function CalendarPanel({ reminders, teams }: Props) {
+export function CalendarPanel({ reminders, teams, onOpenReminder }: Props) {
   const calendarRef = useRef<Calendar>(null);
   const [selected, setSelected] = useState(() => toPickerValue(new Date()));
   
@@ -148,9 +149,16 @@ export function CalendarPanel({ reminders, teams }: Props) {
               const team = teamsMap.get(r.teamId);
               return (
                 <li key={r.id}>
-                  <span className={s.listTime}>{formatTime(r.date)}</span>
-                  <span className={s.listTitle} title={r.title}>{r.title}</span>
-                  {team && <i className={s.dot} style={{ background: team.color }} title={team.name} />}
+                  <button
+                    type="button"
+                    className={s.listItem}
+                    aria-haspopup="dialog"
+                    onClick={() => onOpenReminder(r)}
+                  >
+                    <span className={s.listTime}>{formatTime(r.date)}</span>
+                    <span className={s.listTitle} title={r.title}>{r.title}</span>
+                    {team && <i className={s.dot} style={{ background: team.color }} title={team.name} />}
+                  </button>
                 </li>
               );
             })}

@@ -5,6 +5,7 @@ import { Button, Input, Loader, Toast } from '@skbkontur/react-ui';
 import { CalendarPanel } from '../../components/calendar/CalendarPanel/CalendarPanel';
 import { Sidebar } from '../../components/layout/Sidebar/Sidebar';
 import { ReminderCard } from '../../components/reminders/ReminderCard/ReminderCard';
+import { ReminderDetailsModal } from '../../components/reminders/ReminderDetailsModal/ReminderDetailsModal';
 import { ReminderFormModal } from '../../components/reminders/ReminderFormModal/ReminderFormModal';
 import { useReminders } from '../../hooks/useReminders';
 import { CURRENT_USER, TEAMS } from '../../mocks';
@@ -29,6 +30,7 @@ export function MainPage() {
   const [activeTeamId, setActiveTeamId] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [formOpen, setFormOpen] = useState(false);
+  const [viewedId, setViewedId] = useState<string | null>(null);
   const [editing, setEditing] = useState<Reminder | null>(null);
   const [toast, setToast] = useState<ToastState | null>(null);
   const [today, setToday] = useState(() => new Date());
@@ -50,6 +52,8 @@ export function MainPage() {
   }, [toast]);
 
   const activeTeam = TEAMS.find(t => t.id === activeTeamId) ?? null;
+  const viewedReminder = items.find(reminder => reminder.id === viewedId);
+  const openDetails = (reminder: Reminder) => setViewedId(reminder.id);
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -91,6 +95,7 @@ export function MainPage() {
   const handleDelete = async (id: string) => {
     try {
       await remove(id);
+      setViewedId(current => current === id ? null : current);
       show('Напоминание удалено');
     } catch {
       show('Не удалось удалить напоминание');
@@ -113,8 +118,7 @@ export function MainPage() {
         team={TEAMS.find(team => team.id === reminder.teamId)}
         index={index}
         onTogglePin={handleTogglePin}
-        onEdit={openEdit}
-        onDelete={handleDelete}
+        onOpen={openDetails}
       />
     ));
 
@@ -191,10 +195,21 @@ export function MainPage() {
               </div>
             </section>
 
-            <CalendarPanel reminders={activeReminders} teams={TEAMS} />
+            <CalendarPanel reminders={activeReminders} teams={TEAMS} onOpenReminder={openDetails} />
           </div>
         )}
       </main>
+
+      {viewedReminder && (
+        <ReminderDetailsModal
+          key={viewedReminder.id}
+          reminder={viewedReminder}
+          team={TEAMS.find(team => team.id === viewedReminder.teamId)}
+          onClose={() => setViewedId(null)}
+          onEdit={openEdit}
+          onDelete={handleDelete}
+        />
+      )}
 
       {formOpen && (
         <ReminderFormModal
